@@ -1,7 +1,7 @@
 import { createStore } from 'redux'
 import todoApp from '../src/reducers/reducers'
 import { Provider } from 'react-redux'
-import { React } from 'react'
+import React from 'react'
 import { render } from 'react-dom'
 import  App from '../src/components/App'
 

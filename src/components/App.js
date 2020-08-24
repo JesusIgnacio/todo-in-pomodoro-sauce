@@ -1,4 +1,4 @@
-import { React } from 'react'
+import React from 'react'
 import Footer from '../components/presentational/Footer'
 import AddTodo from '../components/container/AddTodo'
 import VisibleTodoList from '../components/container/VisibleTodoList'

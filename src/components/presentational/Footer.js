@@ -1,4 +1,4 @@
-import { React } from 'react'
+import React from 'react'
 import FilterLink from '../container/FilterLink'
 import VisibilityFilters from '../../actions/actions'
 
