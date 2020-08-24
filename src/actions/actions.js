@@ -31,3 +31,5 @@ export const VisibilityFilters = {
  export function setVisibilityFilter(filter) {
    return { type: SET_VISIBILITY_FILTER, filter}
  }
+
+ export default VisibilityFilters
