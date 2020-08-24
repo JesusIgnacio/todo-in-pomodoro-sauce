@@ -16,20 +16,36 @@ export const VisibilityFilters = {
   SHOW_ACTIVE: 'SHOW_ACTIVE'
 }
 
+let nextTodoId = 0
+
+export const addTodo = text => ({
+  type: 'ADD_TODO',
+  id: nextTodoId++,
+  text
+})
+
+export const setVisibilityFilter = filter => ({
+  type: 'SET_VISIBILITY_FILTER',
+  filter
+})
+
+export const toggleTodo = id => ({
+  type: 'TOGGLE_TODO',
+  id
+})
+
 /*
  * action creators
  */
 
- export function addTodo(text) {
+ /* export function addTodo(text) {
    return { type: ADD_TODO, text }
- }
+ } */
 
- export function toggleTodo(index) {
+/* export function toggleTodo(index) {
    return { type: TOGGLE_TODO, index }
- }
+ }*/
 
- export function setVisibilityFilter(filter) {
+ /* export function setVisibilityFilter(filter) {
    return { type: SET_VISIBILITY_FILTER, filter}
- }
-
- export default VisibilityFilters
+ }*/

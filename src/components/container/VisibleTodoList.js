@@ -1,4 +1,4 @@
-import toggleTodo from '../../actions/actions'
+import { toggleTodo } from '../../actions/actions'
 import TodoList from '../presentational/TodoList'
 import { connect } from 'react-redux'
 
