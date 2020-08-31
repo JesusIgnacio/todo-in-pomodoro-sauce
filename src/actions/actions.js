@@ -17,7 +17,6 @@ export const VisibilityFilters = {
 }
 
 let nextTodoId = 0
-
 export const addTodo = text => ({
   type: 'ADD_TODO',
   id: nextTodoId++,
@@ -33,19 +32,3 @@ export const toggleTodo = id => ({
   type: 'TOGGLE_TODO',
   id
 })
-
-/*
- * action creators
- */
-
- /* export function addTodo(text) {
-   return { type: ADD_TODO, text }
- } */
-
-/* export function toggleTodo(index) {
-   return { type: TOGGLE_TODO, index }
- }*/
-
- /* export function setVisibilityFilter(filter) {
-   return { type: SET_VISIBILITY_FILTER, filter}
- }*/
