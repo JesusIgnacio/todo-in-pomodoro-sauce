@@ -38,4 +38,4 @@ function visibilityFilter(state = SHOW_ALL, action) {
   }
 }
 
-export default todoApp = combineReducers({ visibilityFilter, todos})
+export default combineReducers({ visibilityFilter, todos})
