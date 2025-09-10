@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Droppable } from 'react-beautiful-dnd';
 import { useAppSelector } from '../../store/hooks';
 import { selectVisibleTodos } from '../../store/selectors';
 import { TodoItem } from '../TodoItem/TodoItem';
@@ -62,9 +63,9 @@ export const TodoList: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <span style={{ fontSize: '3rem', marginBottom: '1rem', color: '#bdc3c7' }}>✅</span>
-          <h3>All caught up!</h3>
-          <p>No todos to display. Add one above to get started!</p>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📝</div>
+          <h3>No todos yet!</h3>
+          <p>Add a task above to get started</p>
         </EmptyState>
       </ListContainer>
     );
@@ -72,13 +73,21 @@ export const TodoList: React.FC = () => {
 
   return (
     <ListContainer>
-      <TodoListContainer>
-        <AnimatePresence>
-          {visibleTodos.map((todo) => (
-            <TodoItem key={todo.id} todo={todo} />
-          ))}
-        </AnimatePresence>
-      </TodoListContainer>
+      <Droppable droppableId="todo-list">
+        {(provided) => (
+          <TodoListContainer
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+          >
+            <AnimatePresence>
+              {visibleTodos.map((todo, index) => (
+                <TodoItem key={todo.id} todo={todo} index={index} />
+              ))}
+            </AnimatePresence>
+            {provided.placeholder}
+          </TodoListContainer>
+        )}
+      </Droppable>
     </ListContainer>
   );
 };

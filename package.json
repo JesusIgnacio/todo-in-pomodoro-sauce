@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^2.0.1",
+    "@types/react-beautiful-dnd": "^13.1.8",
     "ajv": "^8.17.1",
     "framer-motion": "^12.23.12",
     "react": "^18.2.0",

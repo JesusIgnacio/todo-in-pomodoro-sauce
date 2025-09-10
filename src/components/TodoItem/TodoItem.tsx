@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { Draggable } from 'react-beautiful-dnd';
 import { useAppDispatch } from '../../store/hooks';
 import { toggleTodo, removeTodo } from '../../store/slices/todoSlice';
 import { startPomodoro } from '../../store/slices/pomodoroSlice';
@@ -8,6 +9,7 @@ import { Todo } from '../../store/slices/todoSlice';
 
 interface TodoItemProps {
   todo: Todo;
+  index: number;
 }
 
 const TodoItemContainer = styled(motion.li)<{ $completed: boolean }>`
@@ -105,7 +107,7 @@ const ActionButton = styled(motion.button)<{ variant?: 'timer' | 'delete' }>`
   }
 `;
 
-export const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
+export const TodoItem: React.FC<TodoItemProps> = ({ todo, index }) => {
   const dispatch = useAppDispatch();
 
   const handleToggle = () => {
@@ -121,50 +123,67 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
   };
 
   return (
-    <TodoItemContainer
-      $completed={todo.completed}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, x: -100 }}
-      transition={{ duration: 0.3 }}
-      layout
-    >
-      <CheckboxContainer $completed={todo.completed} onClick={handleToggle}>
-        {todo.completed ? (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 500, damping: 30 }}
-          >
-            ✓
-          </motion.div>
-        ) : (
-          <span style={{ opacity: 0.3 }}>○</span>
-        )}
-      </CheckboxContainer>
-      <TodoText $completed={todo.completed} onClick={handleToggle}>
-        {todo.text}
-      </TodoText>
-      {!todo.completed && (
-        <ActionButton
-          variant="timer"
-          onClick={handleStartPomodoro}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          title="Start Pomodoro Timer"
+    <Draggable draggableId={todo.id.toString()} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          style={{
+            ...provided.draggableProps.style,
+            opacity: snapshot.isDragging ? 0.8 : 1,
+            transform: snapshot.isDragging 
+              ? `${provided.draggableProps.style?.transform} rotate(5deg)`
+              : provided.draggableProps.style?.transform,
+          }}
         >
-          🍅
-        </ActionButton>
+          <TodoItemContainer
+            $completed={todo.completed}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, x: -100 }}
+            transition={{ duration: 0.3 }}
+            layout
+          >
+          <CheckboxContainer $completed={todo.completed} onClick={handleToggle}>
+            {todo.completed ? (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              >
+                ✓
+              </motion.div>
+            ) : (
+              <span style={{ opacity: 0.3 }}>○</span>
+            )}
+          </CheckboxContainer>
+          <TodoText $completed={todo.completed} onClick={handleToggle}>
+            {todo.text}
+          </TodoText>
+          {!todo.completed && (
+            <ActionButton
+              variant="timer"
+              onClick={handleStartPomodoro}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              title="Start Pomodoro Timer"
+            >
+              🍅
+            </ActionButton>
+          )}
+          <ActionButton
+            variant="delete"
+            onClick={handleDelete}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            title="Delete Todo"
+          >
+            🗑️
+          </ActionButton>
+          </TodoItemContainer>
+        </div>
       )}
-      <ActionButton
-        variant="delete"
-        onClick={handleDelete}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        title="Delete Todo"
-      >
-        🗑️
-      </ActionButton>
-    </TodoItemContainer>
+    </Draggable>
   );
 };

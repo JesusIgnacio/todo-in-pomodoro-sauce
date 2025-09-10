@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { Droppable } from 'react-beautiful-dnd';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
   pausePomodoro,
@@ -16,8 +17,7 @@ import {
 const PomodoroContainer = styled(motion.div)`
   background: linear-gradient(135deg, #ff6b6b, #ee5a24);
   border-radius: 20px;
-  padding: 2rem;
-  margin-bottom: 2rem;
+  padding: 1.5rem;
   box-shadow: 0 8px 32px rgba(255, 107, 107, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
@@ -25,6 +25,7 @@ const PomodoroContainer = styled(motion.div)`
   text-align: center;
   position: relative;
   overflow: hidden;
+  height: fit-content;
 
   &::before {
     content: '';
@@ -36,6 +37,10 @@ const PomodoroContainer = styled(motion.div)`
     background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
     pointer-events: none;
   }
+
+  @media (max-width: 1024px) {
+    margin-bottom: 2rem;
+  }
 `;
 
 const TimerTitle = styled.h2`
@@ -46,15 +51,15 @@ const TimerTitle = styled.h2`
 `;
 
 const TimerDisplay = styled(motion.div)`
-  font-size: 4rem;
+  font-size: 3rem;
   font-weight: 800;
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
-  margin: 1.5rem 0;
+  margin: 1rem 0;
   text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   letter-spacing: -0.02em;
 
   @media (max-width: 768px) {
-    font-size: 3rem;
+    font-size: 2.5rem;
   }
 `;
 
@@ -307,18 +312,25 @@ export const PomodoroTimer: React.FC = () => {
       )}
 
       {!activeTodoText && !isBreak && (
-        <DropZone
-          isActive={false}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🎯</div>
-          <div>Drag a todo here to start a focused session</div>
-          <div style={{ fontSize: '0.9rem', opacity: 0.8, marginTop: '0.5rem' }}>
-            Or click a todo's timer button
-          </div>
-        </DropZone>
+        <Droppable droppableId="pomodoro-timer">
+          {(provided, snapshot) => (
+            <DropZone
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              isActive={snapshot.isDraggingOver}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🎯</div>
+              <div>Drag a todo here to start a focused session</div>
+              <div style={{ fontSize: '0.9rem', opacity: 0.8, marginTop: '0.5rem' }}>
+                Or click a todo's timer button
+              </div>
+              {provided.placeholder}
+            </DropZone>
+          )}
+        </Droppable>
       )}
 
       <div style={{ fontSize: '1rem', margin: '1rem 0', opacity: 0.9 }}>
