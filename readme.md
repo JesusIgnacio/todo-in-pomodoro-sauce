@@ -1,17 +1,26 @@
 # Todo in Pomodoro Sauce 🍅
 
-A modern, fully-featured Todo application built with React 18, Redux Toolkit, and TypeScript. This project demonstrates best practices in modern React development with a clean, maintainable architecture.
+A modern, productivity-focused Todo application that combines task management with the Pomodoro Technique. Built with React 18, Redux Toolkit, and TypeScript, featuring a beautiful UI with smooth animations and comprehensive productivity tracking.
 
 ## ✨ Features
 
+### 🍅 **Pomodoro Timer Integration**
+- **25-minute focus sessions** with automatic break management
+- **Beautiful timer interface** with real-time countdown and progress bar
+- **One-click task focusing** - click the 🍅 button on any todo to start a session
+- **Automatic break cycling** - 5-minute short breaks, 15-minute long breaks after 4 sessions
+- **Productivity statistics** - track completed pomodoros, focus time, and cycles
+- **Visual feedback** with pulsing animations during active sessions
+
+### 📝 **Advanced Todo Management**
 - **Modern React 18** with functional components and hooks
 - **Redux Toolkit** for efficient state management
 - **TypeScript** for type safety and better developer experience
-- **Styled Components** for component-scoped styling
-- **Responsive Design** that works on all devices
+- **Styled Components** for component-scoped styling with glassmorphism effects
+- **Responsive Design** that works beautifully on all devices
 - **Real-time Statistics** showing todo completion progress
 - **Filter System** to view all, active, or completed todos
-- **Smooth Animations** and modern UI/UX
+- **Smooth Framer Motion animations** throughout the interface
 
 ## 🚀 Quick Start
 
@@ -50,18 +59,18 @@ This project follows modern React best practices with a feature-based folder str
 
 ```mermaid
 graph TD
-    A[App] --> B[TodoForm]
-    A --> C[TodoFilters]
-    A --> D[TodoList]
-    A --> E[TodoStats]
-    A --> F[KeyboardHelp]
-    A --> G[ThemeToggle]
-    A --> H[ErrorBoundary]
+    A --> B[PomodoroTimer]
+    A --> C[TodoForm]
+    A --> D[TodoFilters]
+    A --> E[TodoList]
+    A --> F[TodoStats]
+    A --> G[KeyboardHelp]
+    A --> H[ThemeToggle]
+    A --> I[ErrorBoundary]
     
-    D --> I[TodoItem]
+    D --> J[TodoItem]
     
-    B --> J[useAppDispatch]
-    C --> J
+    B --> K[useAppDispatch]
     I --> J
     
     D --> K[useAppSelector]
@@ -168,6 +177,9 @@ src/
 │   ├── TodoStats/          # Statistics display
 │   │   ├── TodoStats.tsx   # Real-time todo statistics
 │   │   └── index.ts
+│   ├── PomodoroTimer/      # Pomodoro technique integration
+│   │   ├── PomodoroTimer.tsx # 25-min timer with break management
+│   │   └── index.ts
 │   ├── KeyboardHelp/       # User experience enhancement
 │   │   ├── KeyboardHelp.tsx # Modal with shortcut guide
 │   │   └── index.ts
@@ -180,7 +192,8 @@ src/
 ├── store/                  # Redux Toolkit configuration
 │   ├── slices/            # Domain-specific state slices
 │   │   ├── todoSlice.ts   # Todo CRUD operations
-│   │   └── filterSlice.ts # Filter state management
+│   │   ├── filterSlice.ts # Filter state management
+│   │   └── pomodoroSlice.ts # Pomodoro timer state
 │   ├── middleware/        # Custom middleware
 │   │   └── persistenceMiddleware.ts # localStorage sync
 │   ├── selectors.ts       # Memoized state selectors
@@ -308,7 +321,8 @@ yarn type-check
 The application uses Redux Toolkit with the following structure:
 
 - **todoSlice**: Manages todo items (add, toggle, remove)
-- **filterSlice**: Manages visibility filters
+- **filterSlice**: Manages visibility filters  
+- **pomodoroSlice**: Manages Pomodoro timer state (sessions, breaks, statistics)
 - **Selectors**: Memoized selectors for derived state
 - **Typed Hooks**: Custom hooks for type-safe Redux usage
 

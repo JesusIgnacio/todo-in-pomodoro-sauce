@@ -1,32 +1,14 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit';
-import todoSlice from './slices/todoSlice';
-import filterSlice from './slices/filterSlice';
-import { loadPersistedState } from './middleware/persistenceMiddleware';
-
-const rootReducer = combineReducers({
-  todos: todoSlice,
-  filter: filterSlice,
-});
-
-const preloadedState = loadPersistedState();
+import { configureStore } from '@reduxjs/toolkit';
+import todoReducer from './slices/todoSlice';
+import filterReducer from './slices/filterSlice';
+import pomodoroReducer from './slices/pomodoroSlice';
 
 export const store = configureStore({
-  reducer: rootReducer,
-  preloadedState,
-});
-
-// Add persistence after store creation
-store.subscribe(() => {
-  try {
-    const state = store.getState();
-    const persistedState = {
-      todos: state.todos,
-      filter: state.filter,
-    };
-    localStorage.setItem('todo-app-state', JSON.stringify(persistedState));
-  } catch (error) {
-    console.warn('Failed to save state to localStorage:', error);
-  }
+  reducer: {
+    todos: todoReducer,
+    filter: filterReducer,
+    pomodoro: pomodoroReducer,
+  },
 });
 
 export type RootState = ReturnType<typeof store.getState>;

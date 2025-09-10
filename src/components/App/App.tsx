@@ -7,6 +7,7 @@ import { TodoFilters } from '../TodoFilters/TodoFilters';
 import { TodoStats } from '../TodoStats/TodoStats';
 import { KeyboardHelp } from '../KeyboardHelp/KeyboardHelp';
 import { ThemeToggle } from '../ThemeToggle/ThemeToggle';
+import { PomodoroTimer } from '../PomodoroTimer/PomodoroTimer';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 
 const AppBackground = styled.div`
@@ -61,6 +62,7 @@ const App: React.FC = () => {
         >
           Todo in Pomodoro Sauce
         </AppTitle>
+        <PomodoroTimer />
         <TodoForm />
         <TodoFilters />
         <TodoList />

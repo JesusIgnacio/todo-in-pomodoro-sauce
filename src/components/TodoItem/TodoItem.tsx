@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useAppDispatch } from '../../store/hooks';
 import { toggleTodo, removeTodo } from '../../store/slices/todoSlice';
+import { startPomodoro } from '../../store/slices/pomodoroSlice';
 import { Todo } from '../../store/slices/todoSlice';
 
 interface TodoItemProps {
@@ -60,31 +61,47 @@ const TodoText = styled.span<{ $completed: boolean }>`
   transition: all 0.2s ease;
 `;
 
-const DeleteButton = styled(motion.button)`
+const ActionButton = styled(motion.button)<{ variant?: 'timer' | 'delete' }>`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  background-color: #ff6b6b;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  opacity: 0;
   transition: all 0.2s ease;
+  font-size: 1.2rem;
+  min-width: 40px;
+  min-height: 40px;
 
-  ${TodoItemContainer}:hover & {
-    opacity: 1;
-  }
+  ${props => props.variant === 'timer' && `
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+      transform: scale(1.05);
+    }
+  `}
 
-  &:hover {
-    background-color: #ff5252;
-    transform: scale(1.05);
-  }
+  ${props => props.variant === 'delete' && `
+    &:hover {
+      background-color: rgba(231, 76, 60, 0.1);
+      transform: scale(1.1);
+    }
+  `}
 
-  svg {
-    font-size: 16px;
+  ${props => !props.variant && `
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+      transform: scale(1.1);
+    }
+  `}
+
+  &:active {
+    transform: scale(0.95);
   }
 `;
 
@@ -97,6 +114,10 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
 
   const handleDelete = () => {
     dispatch(removeTodo(todo.id));
+  };
+
+  const handleStartPomodoro = () => {
+    dispatch(startPomodoro({ todoId: todo.id.toString(), todoText: todo.text }));
   };
 
   return (
@@ -124,13 +145,26 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
       <TodoText $completed={todo.completed} onClick={handleToggle}>
         {todo.text}
       </TodoText>
-      <DeleteButton
+      {!todo.completed && (
+        <ActionButton
+          variant="timer"
+          onClick={handleStartPomodoro}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          title="Start Pomodoro Timer"
+        >
+          🍅
+        </ActionButton>
+      )}
+      <ActionButton
+        variant="delete"
         onClick={handleDelete}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
+        title="Delete Todo"
       >
         🗑️
-      </DeleteButton>
+      </ActionButton>
     </TodoItemContainer>
   );
 };
