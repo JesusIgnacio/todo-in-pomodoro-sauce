@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
-  startPomodoro,
   pausePomodoro,
   resumePomodoro,
   stopPomodoro,

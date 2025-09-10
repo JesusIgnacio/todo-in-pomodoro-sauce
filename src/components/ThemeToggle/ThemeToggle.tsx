@@ -34,7 +34,7 @@ const ToggleButton = styled(motion.button)<{ $isDark: boolean }>`
 `;
 
 export const ThemeToggle: React.FC = () => {
-  const { theme, toggleTheme, isDark } = useTheme();
+  const { toggleTheme, isDark } = useTheme();
 
   return (
     <ToggleButton 
