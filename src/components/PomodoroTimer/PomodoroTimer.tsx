@@ -195,7 +195,6 @@ export const PomodoroTimer: React.FC = () => {
     isPaused,
     timeRemaining,
     totalTime,
-    activeTodoId,
     activeTodoText,
     isBreak,
     completedPomodoros,
