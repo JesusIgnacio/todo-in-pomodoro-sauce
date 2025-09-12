@@ -1,6 +1,7 @@
 # Todo in Pomodoro Sauce 🍅
 
 A modern, productivity-focused Todo application that combines task management with the Pomodoro Technique. Built with React 18, Redux Toolkit, and TypeScript, featuring a beautiful UI with smooth animations and comprehensive productivity tracking.
+[todo-in-pomodoro-sauce](https://todo-in-pomodoro-sauce.netlify.app/)
 
 ## ✨ Features
 
