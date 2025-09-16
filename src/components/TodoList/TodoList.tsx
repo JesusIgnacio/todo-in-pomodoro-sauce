@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Droppable } from 'react-beautiful-dnd';
 import { useAppSelector } from '../../store/hooks';
-import { selectVisibleTodos } from '../../store/selectors';
+import { selectFilteredTodos } from '../../store/selectors/todoSelectors';
 import { TodoItem } from '../TodoItem/TodoItem';
 
 const ListContainer = styled.div`
@@ -53,7 +53,7 @@ const EmptyState = styled(motion.div)`
 `;
 
 export const TodoList: React.FC = () => {
-  const visibleTodos = useAppSelector(selectVisibleTodos);
+  const visibleTodos = useAppSelector(selectFilteredTodos);
 
   if (visibleTodos.length === 0) {
     return (
@@ -80,7 +80,7 @@ export const TodoList: React.FC = () => {
             {...provided.droppableProps}
           >
             <AnimatePresence>
-              {visibleTodos.map((todo, index) => (
+              {visibleTodos.map((todo: any, index: number) => (
                 <TodoItem key={todo.id} todo={todo} index={index} />
               ))}
             </AnimatePresence>

@@ -2,10 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { Draggable } from 'react-beautiful-dnd';
-import { useAppDispatch } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { toggleTodo, removeTodo } from '../../store/slices/todoSlice';
 import { startPomodoro } from '../../store/slices/pomodoroSlice';
 import { Todo } from '../../store/slices/todoSlice';
+import { getContextInfo } from '../../utils/gtdContexts';
 
 interface TodoItemProps {
   todo: Todo;
@@ -29,6 +30,33 @@ const TodoItemContainer = styled(motion.li)<{ $completed: boolean }>`
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transform: translateY(-1px);
   }
+`;
+
+const TodoContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0.5rem;
+`;
+
+const TodoTextRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+`;
+
+const ContextTag = styled.span<{ $color: string }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: ${props => props.$color + '20'};
+  color: ${props => props.$color};
+  border: 1px solid ${props => props.$color + '40'};
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
 `;
 
 const CheckboxContainer = styled.div<{ $completed: boolean }>`
@@ -109,6 +137,7 @@ const ActionButton = styled(motion.button)<{ variant?: 'timer' | 'delete' }>`
 
 export const TodoItem: React.FC<TodoItemProps> = ({ todo, index }) => {
   const dispatch = useAppDispatch();
+  const customContexts = useAppSelector(state => state.customContexts.contexts);
 
   const handleToggle = () => {
     dispatch(toggleTodo(todo.id));
@@ -158,9 +187,16 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo, index }) => {
               <span style={{ opacity: 0.3 }}>○</span>
             )}
           </CheckboxContainer>
-          <TodoText $completed={todo.completed} onClick={handleToggle}>
-            {todo.text}
-          </TodoText>
+          <TodoContent>
+            <TodoTextRow>
+              <TodoText $completed={todo.completed} onClick={handleToggle}>
+                {todo.text}
+              </TodoText>
+              <ContextTag $color={getContextInfo(todo.context, customContexts).color}>
+                {getContextInfo(todo.context, customContexts).icon} {getContextInfo(todo.context, customContexts).label}
+              </ContextTag>
+            </TodoTextRow>
+          </TodoContent>
           {!todo.completed && (
             <ActionButton
               variant="timer"

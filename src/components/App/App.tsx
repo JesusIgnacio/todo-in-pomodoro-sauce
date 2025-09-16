@@ -5,6 +5,8 @@ import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { TodoForm } from '../TodoForm/TodoForm';
 import { TodoList } from '../TodoList/TodoList';
 import { TodoFilters } from '../TodoFilters/TodoFilters';
+import ContextFilter from '../ContextFilter/ContextFilter';
+import CustomContextManager from '../CustomContextManager/CustomContextManager';
 import { TodoStats } from '../TodoStats/TodoStats';
 import { KeyboardHelp } from '../KeyboardHelp/KeyboardHelp';
 import { ThemeToggle } from '../ThemeToggle/ThemeToggle';
@@ -121,6 +123,8 @@ const App: React.FC = () => {
           <TodoSection>
             <TodoForm />
             <TodoFilters />
+            <ContextFilter />
+            <CustomContextManager />
             <TodoList />
             <TodoStats />
           </TodoSection>

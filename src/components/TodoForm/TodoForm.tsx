@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { useAppDispatch } from '../../store/hooks';
-import { addTodo } from '../../store/slices/todoSlice';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { addTodo, GTDContext } from '../../store/slices/todoSlice';
+import { getAllContexts } from '../../utils/gtdContexts';
 
 const FormContainer = styled(motion.form)`
   display: flex;
+  flex-direction: column;
   gap: 1rem;
   margin-bottom: 2rem;
   padding: 1.5rem;
@@ -16,9 +18,17 @@ const FormContainer = styled(motion.form)`
   transition: all 0.3s ease;
   
   @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`;
+
+const FormRow = styled.div`
+  display: flex;
+  gap: 1rem;
+  
+  @media (max-width: 768px) {
     flex-direction: column;
     gap: 1rem;
-    padding: 1rem;
   }
 `;
 
@@ -106,17 +116,48 @@ const AddButton = styled(motion.button)`
   }
 `;
 
+const ContextSelect = styled.select`
+  padding: 1rem;
+  border: 2px solid #e1e8ed;
+  border-radius: 12px;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.2s ease;
+  background-color: #fafbfc;
+  color: #2c3e50;
+  min-height: 56px;
+  min-width: 200px;
+  cursor: pointer;
+
+  &:focus {
+    border-color: #3498db;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 16px;
+    min-width: auto;
+    width: 100%;
+  }
+`;
+
 export const TodoForm: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
+  const [selectedContext, setSelectedContext] = useState<GTDContext>('inbox');
   const dispatch = useAppDispatch();
+  const customContexts = useAppSelector(state => state.customContexts.contexts);
+  
+  const allContexts = getAllContexts(customContexts);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedValue = inputValue.trim();
     
     if (trimmedValue) {
-      dispatch(addTodo(trimmedValue));
+      dispatch(addTodo({ text: trimmedValue, context: selectedContext }));
       setInputValue('');
+      setSelectedContext('inbox');
     }
   };
 
@@ -127,18 +168,30 @@ export const TodoForm: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <InputContainer>
-        <InputIcon>
-          ✏️
-        </InputIcon>
-        <TodoInput
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="What needs to be done?"
-          autoFocus
-        />
-      </InputContainer>
+      <FormRow>
+        <InputContainer>
+          <InputIcon>
+            ✏️
+          </InputIcon>
+          <TodoInput
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder="What needs to be done?"
+            autoFocus
+          />
+        </InputContainer>
+        <ContextSelect
+          value={selectedContext}
+          onChange={(e) => setSelectedContext(e.target.value as GTDContext)}
+        >
+          {allContexts.map((context: any) => (
+            <option key={context.id} value={context.id}>
+              {context.icon} {context.label}
+            </option>
+          ))}
+        </ContextSelect>
+      </FormRow>
       <AddButton
         type="submit"
         disabled={!inputValue.trim()}
