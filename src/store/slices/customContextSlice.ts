@@ -26,12 +26,6 @@ const customContextSlice = createSlice({
     removeCustomContext: (state, action: PayloadAction<string>) => {
       state.contexts = state.contexts.filter(context => context.id !== action.payload);
     },
-    updateCustomContext: (state, action: PayloadAction<CustomContext>) => {
-      const index = state.contexts.findIndex(context => context.id === action.payload.id);
-      if (index !== -1) {
-        state.contexts[index] = action.payload;
-      }
-    },
     loadCustomContexts: (state, action: PayloadAction<CustomContext[]>) => {
       state.contexts = action.payload;
     },
@@ -41,7 +35,6 @@ const customContextSlice = createSlice({
 export const { 
   addCustomContext, 
   removeCustomContext, 
-  updateCustomContext, 
   loadCustomContexts 
 } = customContextSlice.actions;
 

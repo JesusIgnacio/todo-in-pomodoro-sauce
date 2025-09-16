@@ -264,8 +264,6 @@ const CustomContextManager: React.FC = () => {
     dispatch(removeCustomContext(contextId));
   };
 
-  console.log('CustomContextManager rendering, customContexts:', customContexts);
-  
   return (
     <ManagerContainer
       $theme={theme}
