@@ -21,6 +21,15 @@ A modern, productivity-focused Todo application that combines task management wi
 - **Real-time Statistics** showing todo completion progress
 - **Filter System** to view all, active, or completed todos
 - **Smooth Framer Motion animations** throughout the interface
+- **Drag & Drop** functionality to assign todos to Pomodoro sessions
+
+### 🎯 **Getting Things Done (GTD) Integration**
+- **8 Built-in GTD Contexts**: Inbox, @Calls, @Computer, @Errands, @Home, @Office, @Waiting For, Someday/Maybe
+- **Custom Context Creation** - Create personalized contexts like @Shopping, @Gym, @Reading
+- **Context-based Filtering** - Filter todos by specific contexts for focused workflow
+- **Color-coded Context Tags** - Visual organization with unique colors and icons
+- **Context Persistence** - Custom contexts saved automatically in localStorage
+- **Seamless Integration** - Contexts work with all existing features (Pomodoro, drag-drop, filtering)
 
 ## 🚀 Quick Start
 
@@ -62,20 +71,24 @@ graph TD
     A --> B[PomodoroTimer]
     A --> C[TodoForm]
     A --> D[TodoFilters]
-    A --> E[TodoList]
-    A --> F[TodoStats]
-    A --> G[KeyboardHelp]
-    A --> H[ThemeToggle]
-    A --> I[ErrorBoundary]
+    A --> E[ContextFilter]
+    A --> F[CustomContextManager]
+    A --> G[TodoList]
+    A --> H[TodoStats]
+    A --> I[KeyboardHelp]
+    A --> J[ThemeToggle]
+    A --> K[ErrorBoundary]
     
-    D --> J[TodoItem]
+    G --> L[TodoItem]
     
-    B --> K[useAppDispatch]
-    I --> J
+    B --> M[useAppDispatch]
+    K --> L
     
-    D --> K[useAppSelector]
-    E --> K
-    C --> K
+    D --> M[useAppSelector]
+    E --> M
+    F --> M
+    G --> M
+    C --> M
     
     style A fill:#e1f5fe
     style J fill:#f3e5f5
@@ -115,6 +128,8 @@ flowchart TD
         E[Redux Store]
         F[todoSlice]
         G[filterSlice]
+        P[customContextSlice]
+        Q[pomodoroSlice]
         H[Selectors]
     end
     
@@ -163,16 +178,22 @@ src/
 │   │   ├── App.test.tsx    # Comprehensive test suite
 │   │   └── index.ts        # Barrel export
 │   ├── TodoForm/           # Todo creation functionality
-│   │   ├── TodoForm.tsx    # Form with validation & state
+│   │   ├── TodoForm.tsx    # Form with validation & GTD context selection
 │   │   └── index.ts
 │   ├── TodoList/           # Todo display container
-│   │   ├── TodoList.tsx    # List with empty state handling
+│   │   ├── TodoList.tsx    # List with empty state handling & drag-drop
 │   │   └── index.ts
 │   ├── TodoItem/           # Individual todo management
-│   │   ├── TodoItem.tsx    # Item with toggle/delete actions
+│   │   ├── TodoItem.tsx    # Item with toggle/delete/context display
 │   │   └── index.ts
 │   ├── TodoFilters/        # Filter state management
 │   │   ├── TodoFilters.tsx # Filter buttons with active state
+│   │   └── index.ts
+│   ├── ContextFilter/      # GTD context filtering
+│   │   ├── ContextFilter.tsx # Context filter buttons with icons
+│   │   └── index.ts
+│   ├── CustomContextManager/ # Custom GTD context management
+│   │   ├── CustomContextManager.tsx # CRUD for custom contexts
 │   │   └── index.ts
 │   ├── TodoStats/          # Statistics display
 │   │   ├── TodoStats.tsx   # Real-time todo statistics
@@ -191,18 +212,21 @@ src/
 │       └── index.ts
 ├── store/                  # Redux Toolkit configuration
 │   ├── slices/            # Domain-specific state slices
-│   │   ├── todoSlice.ts   # Todo CRUD operations
-│   │   ├── filterSlice.ts # Filter state management
+│   │   ├── todoSlice.ts   # Todo CRUD operations with GTD contexts
+│   │   ├── filterSlice.ts # Filter state management with context filtering
+│   │   ├── customContextSlice.ts # Custom GTD context management
 │   │   └── pomodoroSlice.ts # Pomodoro timer state
-│   ├── middleware/        # Custom middleware
-│   │   └── persistenceMiddleware.ts # localStorage sync
-│   ├── selectors.ts       # Memoized state selectors
+│   ├── selectors/         # Memoized state selectors
+│   │   └── todoSelectors.ts # Filtered todos with context support
 │   ├── hooks.ts          # Typed Redux hooks
 │   └── index.ts          # Store configuration & types
+├── utils/                # Utility functions
+│   └── gtdContexts.ts   # GTD context definitions and helpers
+├── contexts/            # React contexts
+│   └── ThemeContext.tsx # Theme provider and management
 ├── hooks/                # Custom React hooks
 │   ├── useLocalStorage.ts # localStorage abstraction
 │   ├── useKeyboardShortcuts.ts # Keyboard navigation
-│   ├── useTheme.ts       # Theme management
 │   └── index.ts          # Hook exports
 ├── index.tsx             # Application entry point
 ├── index.css            # Global styles & theme variables
@@ -263,6 +287,9 @@ export const selectVisibleTodos = createSelector(
 - **Redux Toolkit** - Official, opinionated Redux toolset
 - **TypeScript** - Static type checking
 - **Styled Components** - CSS-in-JS styling solution
+- **Framer Motion** - Advanced animations and transitions
+- **React Beautiful DnD** - Drag and drop functionality
+- **React Icons** - Comprehensive icon library
 - **React Testing Library** - Testing utilities
 - **Create React App** - Build tooling and configuration
 
@@ -274,6 +301,9 @@ export const selectVisibleTodos = createSelector(
   "react": "^18.2.0",
   "react-redux": "^9.0.4",
   "styled-components": "^6.1.8",
+  "framer-motion": "^10.16.5",
+  "react-beautiful-dnd": "^13.1.1",
+  "react-icons": "^4.12.0",
   "typescript": "^5.2.2"
 }
 ```
@@ -320,10 +350,11 @@ yarn type-check
 
 The application uses Redux Toolkit with the following structure:
 
-- **todoSlice**: Manages todo items (add, toggle, remove)
-- **filterSlice**: Manages visibility filters  
+- **todoSlice**: Manages todo items with GTD context support (add, toggle, remove, context assignment)
+- **filterSlice**: Manages visibility filters and GTD context filtering
+- **customContextSlice**: Manages custom GTD contexts (CRUD operations, localStorage persistence)
 - **pomodoroSlice**: Manages Pomodoro timer state (sessions, breaks, statistics)
-- **Selectors**: Memoized selectors for derived state
+- **Selectors**: Memoized selectors for derived state with context filtering
 - **Typed Hooks**: Custom hooks for type-safe Redux usage
 
 ## 🎨 Styling Approach
