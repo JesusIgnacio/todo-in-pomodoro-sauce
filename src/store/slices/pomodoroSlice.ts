@@ -85,7 +85,7 @@ const pomodoroSlice = createSlice({
       state.activeTodoId = null;
       state.activeTodoText = null;
     },
-    resetPomodoro: (state) => {
+    resetPomodoro: () => {
       return initialState;
     },
   },

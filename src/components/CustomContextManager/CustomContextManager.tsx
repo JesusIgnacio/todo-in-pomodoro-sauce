@@ -9,7 +9,9 @@ import {
   CustomContext 
 } from '../../store/slices/customContextSlice';
 import { useTheme, Theme } from '../../contexts/ThemeContext';
+import { useUser } from '../../contexts/UserContext';
 import { generateContextId } from '../../utils/gtdContexts';
+import ProUpgradeModal from '../ProUpgradeModal';
 
 const ManagerContainer = styled(motion.div)<{ $theme: Theme }>`
   background: ${props => props.$theme.name === 'dark' 
@@ -161,12 +163,6 @@ const ContextItem = styled(motion.div)<{ $theme: Theme }>`
     : 'rgba(0, 0, 0, 0.05)'};
 `;
 
-const ContextInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex: 1;
-`;
 
 const ContextTag = styled.span<{ $color: string }>`
   display: inline-flex;
@@ -181,12 +177,6 @@ const ContextTag = styled.span<{ $color: string }>`
   font-weight: 500;
 `;
 
-const ContextDescription = styled.span<{ $theme: Theme }>`
-  color: ${props => props.$theme.name === 'dark' 
-    ? 'rgba(255, 255, 255, 0.7)' 
-    : 'rgba(0, 0, 0, 0.6)'};
-  font-size: 0.875rem;
-`;
 
 const DeleteButton = styled(motion.button)`
   padding: 0.5rem;
@@ -207,9 +197,11 @@ const DeleteButton = styled(motion.button)`
 const CustomContextManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const { theme } = useTheme();
+  const { isPro } = useUser();
   const customContexts = useAppSelector(state => state.customContexts.contexts);
   
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [formData, setFormData] = useState({
     label: '',
     icon: '🏷️',
@@ -217,8 +209,10 @@ const CustomContextManager: React.FC = () => {
     description: ''
   });
 
-  // Load custom contexts from localStorage on mount
+  // Load custom contexts from localStorage on mount (only for pro users)
   useEffect(() => {
+    if (!isPro) return;
+    
     const saved = localStorage.getItem('customContexts');
     if (saved) {
       try {
@@ -228,17 +222,25 @@ const CustomContextManager: React.FC = () => {
         console.error('Failed to load custom contexts:', error);
       }
     }
-  }, [dispatch]);
+  }, [dispatch, isPro]);
 
   // Save to localStorage whenever contexts change
   useEffect(() => {
     localStorage.setItem('customContexts', JSON.stringify(customContexts));
   }, [customContexts]);
 
+  const handleAddContextClick = () => {
+    if (!isPro) {
+      setShowUpgradeModal(true);
+      return;
+    }
+    setIsFormVisible(!isFormVisible);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.label.trim()) return;
+    if (!isPro || !formData.label.trim()) return;
 
     const newContext: CustomContext = {
       id: generateContextId(formData.label),
@@ -261,6 +263,7 @@ const CustomContextManager: React.FC = () => {
   };
 
   const handleDelete = (contextId: string) => {
+    if (!isPro) return;
     dispatch(removeCustomContext(contextId));
   };
 
@@ -277,12 +280,12 @@ const CustomContextManager: React.FC = () => {
         </ManagerTitle>
         <AddButton
           $theme={theme}
-          onClick={() => setIsFormVisible(!isFormVisible)}
+          onClick={handleAddContextClick}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           style={{ zIndex: 10, position: 'relative' }}
         >
-          {isFormVisible ? '✕ Cancel' : '+ Add Context'}
+          {isFormVisible ? '✕ Cancel' : isPro ? '+ Add Context' : '🔒 Add Context (Pro)'}
         </AddButton>
       </ManagerHeader>
 
@@ -329,7 +332,7 @@ const CustomContextManager: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {customContexts.length > 0 && (
+      {isPro && customContexts.length > 0 && (
         <ContextList>
           <AnimatePresence>
             {customContexts.map((context) => (
@@ -338,31 +341,31 @@ const CustomContextManager: React.FC = () => {
                 $theme={theme}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
+                exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2 }}
               >
-                <ContextInfo>
-                  <ContextTag $color={context.color}>
-                    {context.icon} {context.label}
-                  </ContextTag>
-                  {context.description && (
-                    <ContextDescription $theme={theme}>
-                      {context.description}
-                    </ContextDescription>
-                  )}
-                </ContextInfo>
+                <ContextTag $color={context.color}>
+                  <span>{context.icon}</span>
+                  <span>{context.label}</span>
+                </ContextTag>
                 <DeleteButton
                   onClick={() => handleDelete(context.id)}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  🗑️
+                  ✕
                 </DeleteButton>
               </ContextItem>
             ))}
           </AnimatePresence>
         </ContextList>
       )}
+
+      <ProUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        feature="Custom Contexts"
+      />
     </ManagerContainer>
   );
 };
