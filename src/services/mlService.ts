@@ -298,7 +298,7 @@ class MLService {
     if (hasSpecificDetails) confidence += 0.15;
     
     // Increase confidence for proper todo formatting
-    const isWellFormatted = /^[-•*\d+\.\[\]]\s*[A-Z]/.test(todoText.trim());
+    const isWellFormatted = /^[-•*\d+.[\]]\s*[A-Z]/.test(todoText.trim());
     if (isWellFormatted) confidence += 0.1;
     
     // Realistic confidence variations based on OCR-like scenarios

@@ -127,5 +127,5 @@ export const isCustomContext = (contextId: string): boolean => {
 };
 
 export const generateContextId = (label: string): string => {
-  return label.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  return label.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/, '');
 };
