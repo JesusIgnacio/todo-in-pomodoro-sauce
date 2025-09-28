@@ -31,6 +31,14 @@ A modern, productivity-focused Todo application that combines task management wi
 - **Context Persistence** - Custom contexts saved automatically in localStorage
 - **Seamless Integration** - Contexts work with all existing features (Pomodoro, drag-drop, filtering)
 
+### 📷 **Image-to-Todo OCR (Client‑side)**
+- **Import todos from images** using the `ImageTodoExtractor` component
+- **Tesseract.js OCR** runs 100% in the browser (privacy‑preserving, free)
+- **Progress tracking** with live OCR updates in the UI
+- **Handwritten & printed support** with robust pattern extraction
+- **Context inference** – inferred `@Errands`, `@Calls`, `@Office`, etc.
+- **Graceful fallback** – demo extraction if OCR fails, so the feature is always usable
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -58,7 +66,7 @@ npm start
 yarn start
 ```
 
-The app will open at [http://localhost:3000](http://localhost:3000)
+The app will open at [http://localhost:3001](http://localhost:3001)
 
 ## 🏗️ Architecture
 
@@ -289,8 +297,10 @@ export const selectVisibleTodos = createSelector(
 - **Styled Components** - CSS-in-JS styling solution
 - **Framer Motion** - Advanced animations and transitions
 - **React Beautiful DnD** - Drag and drop functionality
-- **React Icons** - Comprehensive icon library
-- **React Testing Library** - Testing utilities
+- **React Icons / Feather** - Lightweight, consistent iconography
+- **Tesseract.js** - Client‑side OCR for images
+- **Transformers.js (optional)** - Lightweight on‑device ML experiments (kept for future/hybrid)
+- **React Webcam** - Camera capture for OCR input
 - **Create React App** - Build tooling and configuration
 
 ## 📦 Key Dependencies
@@ -298,15 +308,48 @@ export const selectVisibleTodos = createSelector(
 ```json
 {
   "@reduxjs/toolkit": "^2.0.1",
+  "@xenova/transformers": "^2.17.2",
   "react": "^18.2.0",
   "react-redux": "^9.0.4",
   "styled-components": "^6.1.8",
-  "framer-motion": "^10.16.5",
+  "framer-motion": "^12.23.12",
   "react-beautiful-dnd": "^13.1.1",
-  "react-icons": "^4.12.0",
-  "typescript": "^5.2.2"
+  "react-icons": "^5.5.0",
+  "react-webcam": "^7.2.0",
+  "tesseract.js": "^6.0.1",
+  "typescript": "^4.9.5"
 }
 ```
+
+## 🤔 Why these libraries?
+
+- **React 18**: modern functional components and hooks; stable ecosystem.
+- **Redux Toolkit**: reduces boilerplate; Immer for immutable updates; battle‑tested for complex state (todos, pomodoro, OCR state).
+- **TypeScript**: safer refactors; strong typing across slices, hooks, and components.
+- **Styled Components**: theme‑aware, co‑located styles; transient props (e.g., `$isActive`, `$confidence`) avoid React DOM warnings.
+- **Framer Motion**: delightful motion for timers, lists, and modals with minimal code.
+- **React Beautiful DnD**: accessible drag‑and‑drop to connect todos with the Pomodoro timer drop zone.
+- **React Icons / Feather**: consistent icons with tiny footprint and tree‑shaking.
+- **Tesseract.js**: fully client‑side OCR (no server keys, free tier, privacy). Ideal for offline or privacy‑sensitive extraction of todos from images.
+- **React Webcam**: simple camera capture pipeline feeding directly into OCR for mobile and desktop.
+- **@xenova/transformers (optional)**: kept for future hybrid extraction or local ML inference. Provides an avenue to augment OCR for complex inputs.
+- **Create React App**: zero‑config tooling to focus on features; fast local iteration.
+
+## 🧠 OCR flow overview
+
+1. User clicks "From Image" in `TodoForm` to open `ImageTodoExtractor`.
+2. Choose camera capture (`react-webcam`) or file upload.
+3. `mlService.extractTodosFromImage()` runs **Tesseract.js** with progress callbacks.
+4. Extracted text is parsed into todos with confidence + context inference.
+5. The user reviews and imports selected todos into the main list.
+
+If OCR text is low‑quality (handwriting edge cases), the service applies flexible patterns and reconstruction heuristics to recover likely todos (e.g., "buy coffee", "call emergency", "schedule meeting").
+
+## 🧹 Developer UX
+
+- `npm run type-check` – TypeScript type checking (no emit).
+- `npm run lint:ts-unused` – Fails on unused locals/params to keep the codebase clean.
+- Optional Husky pre‑commit hook can run both scripts before each commit.
 
 ## 🧪 Testing
 
