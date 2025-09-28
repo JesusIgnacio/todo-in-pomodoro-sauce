@@ -153,13 +153,13 @@ const TimerButton = styled(motion.button)<{ variant?: 'primary' | 'secondary' | 
   }
 `;
 
-const DropZone = styled(motion.div)<{ isActive: boolean }>`
-  border: 2px dashed ${props => props.isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.4)'};
+const DropZone = styled(motion.div)<{ $isActive: boolean }>`
+  border: 2px dashed ${props => props.$isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.4)'};
   border-radius: 12px;
   padding: 2rem;
   margin: 1rem 0;
   text-align: center;
-  background: ${props => props.isActive ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
+  background: ${props => props.$isActive ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
   transition: all 0.3s ease;
   cursor: pointer;
 
@@ -317,7 +317,7 @@ export const PomodoroTimer: React.FC = () => {
             <DropZone
               ref={provided.innerRef}
               {...provided.droppableProps}
-              isActive={snapshot.isDraggingOver}
+              $isActive={snapshot.isDraggingOver}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
