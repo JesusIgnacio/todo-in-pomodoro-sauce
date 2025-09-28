@@ -3,6 +3,7 @@ import todoReducer from './slices/todoSlice';
 import filterReducer from './slices/filterSlice';
 import pomodoroReducer from './slices/pomodoroSlice';
 import customContextReducer from './slices/customContextSlice';
+import imageProcessingReducer from './slices/imageProcessingSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     filter: filterReducer,
     pomodoro: pomodoroReducer,
     customContexts: customContextReducer,
+    imageProcessing: imageProcessingReducer,
   },
 });
 

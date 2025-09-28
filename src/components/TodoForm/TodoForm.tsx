@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Camera } from 'react-feather';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { addTodo, GTDContext } from '../../store/slices/todoSlice';
 import { getAllContexts } from '../../utils/gtdContexts';
+import { useUser } from '../../contexts/UserContext';
+import { ImageTodoExtractor } from '../ImageTodoExtractor';
 
 const FormContainer = styled(motion.form)`
   display: flex;
@@ -76,6 +79,15 @@ const InputIcon = styled.div`
   z-index: 1;
 `;
 
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 1rem;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
 const AddButton = styled(motion.button)`
   display: flex;
   align-items: center;
@@ -92,6 +104,7 @@ const AddButton = styled(motion.button)`
   transition: all 0.2s ease;
   box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
   min-height: 56px;
+  flex: 1;
 
   &:hover {
     background: linear-gradient(135deg, #2980b9, #3498db);
@@ -113,6 +126,41 @@ const AddButton = styled(motion.button)`
   @media (max-width: 768px) {
     width: 100%;
     padding: 1rem;
+  }
+`;
+
+const CameraButton = styled(motion.button)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(155, 89, 182, 0.3);
+  min-height: 56px;
+  min-width: 160px;
+
+  &:hover {
+    background: linear-gradient(135deg, #8e44ad, #9b59b6);
+    box-shadow: 0 6px 16px rgba(155, 89, 182, 0.4);
+    transform: translateY(-1px);
+  }
+
+  svg {
+    font-size: 1.1rem;
+  }
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 1rem;
+    min-width: auto;
   }
 `;
 
@@ -143,63 +191,84 @@ const ContextSelect = styled.select`
 `;
 
 export const TodoForm: React.FC = () => {
-  const [inputValue, setInputValue] = useState('');
-  const [selectedContext, setSelectedContext] = useState<GTDContext>('inbox');
   const dispatch = useAppDispatch();
+  const { isPro } = useUser();
   const customContexts = useAppSelector(state => state.customContexts.contexts);
+  const [text, setText] = useState('');
+  const [selectedContext, setSelectedContext] = useState<GTDContext>('inbox');
+  const [showImageExtractor, setShowImageExtractor] = useState(false);
   
-  const allContexts = getAllContexts(customContexts);
+  const allContexts = getAllContexts(customContexts, isPro);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmedValue = inputValue.trim();
+    const trimmedValue = text.trim();
     
     if (trimmedValue) {
       dispatch(addTodo({ text: trimmedValue, context: selectedContext }));
-      setInputValue('');
+      setText('');
       setSelectedContext('inbox');
     }
   };
 
   return (
-    <FormContainer
-      onSubmit={handleSubmit}
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <FormRow>
-        <InputContainer>
-          <InputIcon>
-            ✏️
-          </InputIcon>
-          <TodoInput
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="What needs to be done?"
-            autoFocus
-          />
-        </InputContainer>
-        <ContextSelect
-          value={selectedContext}
-          onChange={(e) => setSelectedContext(e.target.value as GTDContext)}
-        >
-          {allContexts.map((context: any) => (
-            <option key={context.id} value={context.id}>
-              {context.icon} {context.label}
-            </option>
-          ))}
-        </ContextSelect>
-      </FormRow>
-      <AddButton
-        type="submit"
-        disabled={!inputValue.trim()}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+    <>
+      <FormContainer
+        onSubmit={handleSubmit}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
       >
-        ➕ Add Todo
-      </AddButton>
-    </FormContainer>
+        <FormRow>
+          <InputContainer>
+            <InputIcon>
+              ✏️
+            </InputIcon>
+            <TodoInput
+              type="text"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="What needs to be done?"
+              autoFocus
+            />
+          </InputContainer>
+          <ContextSelect
+            value={selectedContext}
+            onChange={(e) => setSelectedContext(e.target.value as GTDContext)}
+          >
+            {allContexts.map((context: any) => (
+              <option key={context.id} value={context.id}>
+                {context.icon} {context.label}
+              </option>
+            ))}
+          </ContextSelect>
+        </FormRow>
+        <ButtonGroup>
+          <AddButton
+            type="submit"
+            disabled={!text.trim()}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            ➕ Add Todo
+          </AddButton>
+          <CameraButton
+            type="button"
+            onClick={() => setShowImageExtractor(true)}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Camera size={20} />
+            From Image
+          </CameraButton>
+        </ButtonGroup>
+      </FormContainer>
+      
+      <AnimatePresence>
+        {showImageExtractor && (
+          <ImageTodoExtractor onClose={() => setShowImageExtractor(false)} />
+        )}
+      </AnimatePresence>
+    </>
   );
 };
