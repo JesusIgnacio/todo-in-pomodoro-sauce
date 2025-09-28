@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setContextFilter } from '../../store/slices/filterSlice';
 import { GTDContext } from '../../store/slices/todoSlice';
 import { getAllContexts } from '../../utils/gtdContexts';
+import { useUser } from '../../contexts/UserContext';
 import { useTheme, Theme } from '../../contexts/ThemeContext';
 
 const ContextFilterContainer = styled.div`
@@ -104,10 +105,11 @@ const AllButton = styled(motion.button)<{
 const ContextFilter: React.FC = () => {
   const dispatch = useAppDispatch();
   const { theme } = useTheme();
+  const { isPro } = useUser();
   const selectedContext = useAppSelector(state => state.filter.selectedContext);
   const customContexts = useAppSelector(state => state.customContexts.contexts);
   
-  const allContexts = getAllContexts(customContexts);
+  const allContexts = getAllContexts(customContexts, isPro);
 
   const handleContextChange = (context: GTDContext | 'all') => {
     dispatch(setContextFilter(context));

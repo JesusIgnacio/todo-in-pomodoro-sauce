@@ -101,16 +101,25 @@ export const getContextLabel = (context: GTDContext): string => {
   return getContextInfo(context).label;
 };
 
-export const getAllContexts = (customContexts: CustomContext[]): GTDContextInfo[] => {
-  const customAsGTD: GTDContextInfo[] = customContexts.map(custom => ({
-    id: custom.id,
-    label: custom.label,
-    icon: custom.icon,
-    color: custom.color,
-    description: custom.description,
+export const getAllContexts = (customContexts: CustomContext[] = [], isPro: boolean = false): GTDContextInfo[] => {
+  const builtInContexts = Object.entries(GTD_CONTEXTS).map(([key, context]) => ({
+    ...context,
+    id: key as GTDContext
   }));
   
-  return [...GTD_CONTEXTS, ...customAsGTD];
+  if (!isPro) {
+    return builtInContexts;
+  }
+  
+  const customContextInfos = customContexts.map(context => ({
+    id: context.id,
+    label: context.label,
+    icon: context.icon,
+    color: context.color,
+    description: context.description
+  }));
+  
+  return [...builtInContexts, ...customContextInfos];
 };
 
 export const isCustomContext = (contextId: string): boolean => {

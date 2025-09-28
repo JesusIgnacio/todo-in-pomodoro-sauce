@@ -2,19 +2,21 @@ import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import { TodoForm } from '../TodoForm/TodoForm';
-import { TodoList } from '../TodoList/TodoList';
-import { TodoFilters } from '../TodoFilters/TodoFilters';
-import ContextFilter from '../ContextFilter/ContextFilter';
-import CustomContextManager from '../CustomContextManager/CustomContextManager';
-import { TodoStats } from '../TodoStats/TodoStats';
-import { KeyboardHelp } from '../KeyboardHelp/KeyboardHelp';
-import { ThemeToggle } from '../ThemeToggle/ThemeToggle';
-import { PomodoroTimer } from '../PomodoroTimer/PomodoroTimer';
-import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { startPomodoro } from '../../store/slices/pomodoroSlice';
-import { useTheme } from '../../contexts/ThemeContext';
+import { TodoForm } from '../TodoForm';
+import { TodoList } from '../TodoList';
+import { TodoFilters } from '../TodoFilters';
+import { TodoStats } from '../TodoStats';
+import { PomodoroTimer } from '../PomodoroTimer/PomodoroTimer';
+import { KeyboardHelp } from '../KeyboardHelp';
+import { ThemeToggle } from '../ThemeToggle';
+import UserPlanBadge from '../UserPlanBadge';
+import { ThemeProvider, useTheme } from '../../contexts/ThemeContext';
+import { UserProvider } from '../../contexts/UserContext';
+import ContextFilter from '../ContextFilter/ContextFilter';
+import CustomContextManager from '../CustomContextManager/CustomContextManager';
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 
 const AppBackground = styled.div<{ $theme: any }>`
   min-height: 100vh;
@@ -84,7 +86,7 @@ const AppTitle = styled(motion.h1)`
   }
 `;
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
   useKeyboardShortcuts();
   const dispatch = useAppDispatch();
   const { theme } = useTheme();
@@ -118,6 +120,7 @@ const App: React.FC = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           Todo in Pomodoro Sauce
+          <UserPlanBadge />
         </AppTitle>
         <MainLayout>
           <TodoSection>
@@ -137,6 +140,16 @@ const App: React.FC = () => {
       </AppContainer>
     </AppBackground>
     </DragDropContext>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <ThemeProvider>
+      <UserProvider>
+        <AppContent />
+      </UserProvider>
+    </ThemeProvider>
   );
 };
 
